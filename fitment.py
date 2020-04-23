@@ -1,4 +1,6 @@
+import os
 import xml.etree.ElementTree as ET
+import tempfile
 
 import requests
 from flask import Flask
@@ -48,11 +50,11 @@ def post_get_item(input_data):
     get_item_headers = dict(GET_ITEM_HEADERS)
     get_item_headers['X-EBAY-API-APP-ID'] = input_data['ebay_api_app_id']
     request_txt = GET_ITEM.format(**input_data)
-    with open('get_request.txt', 'w') as file:
-        file.write(request_txt)
+    # with open('get_request.txt', 'w') as file:
+    #     file.write(request_txt)
     r = requests.post('https://open.api.ebay.com/shopping', data=request_txt, headers=get_item_headers)
-    with open('get_response.txt', 'w') as file:
-        file.write(r.text)
+    # with open('get_response.txt', 'w') as file:
+    #     file.write(r.text)
     return r.ok, ET.fromstring(r.text)
 
 
@@ -69,12 +71,15 @@ def post_revise_item(input_data, compatibility):
     item = revise_item_xml.find("ns0:Item", ns)
     item.append(compatibility)
     tree = ET.ElementTree(revise_item_xml)
-    tree.write('revise_request.xml', xml_declaration=True, encoding='UTF-8')
-    with open('revise_request.xml') as file:
+    fd, tmpfile = tempfile.mkstemp()
+    tree.write(tmpfile, xml_declaration=True, encoding='UTF-8')
+    with open(tmpfile) as file:
         contents = file.read()
+    os.close(fd)
+    os.unlink(tmpfile)
     r = requests.post("https://api.ebay.com/ws/api.dll", data=contents, headers=REVISE_ITEM_HEADERS)
-    with open('revise_response.xml', 'w') as file:
-        file.write(r.text)
+    # with open('revise_response.xml', 'w') as file:
+    #     file.write(r.text)
     return r.text
 
 
@@ -92,4 +97,4 @@ def getitem():
         compatibility = get_compatibility(get_item_response)
         result = post_revise_item(input_data, compatibility)
         return render_template('index.html', result=result)
-    return render_template('index.html', result='nothing')
+    return render_template('index.html', result='')
