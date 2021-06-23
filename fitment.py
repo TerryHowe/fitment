@@ -89,6 +89,8 @@ def getitem():
         input_data = {
             'source': request.form['source'],
             'destination': request.form['destination'],
+            'ebay_api_app_id': 'unknown',
+            'ebay_auth_token': 'unknown',
         }
         input_data.update(get_secret())
         is_ok, get_item_response = post_get_item(input_data)

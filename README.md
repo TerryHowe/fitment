@@ -7,3 +7,10 @@ use has an MPN or interchange number to provide fitment. This application uses t
 one listing to another. You need to register in the ebay developers program and get a token.
 
 I'm storing secrets in `.secrets.yml`, don't be like me.
+
+    ebay_api_app_id: 'blah'
+    ebay_auth_token: 'blech'
+
+To run
+
+    ./run.sh
